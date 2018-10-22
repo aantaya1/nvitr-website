@@ -1,0 +1,48 @@
+{
+  "name": "fp",
+  "version": "1.0.0",
+  "description": "Final Project for CS4241",
+  "main": "server.js",
+  "directories": {
+    "test": "test"
+  },
+  "scripts": {
+    "test": "mocha",
+    "start": "node server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jnpalmstrom/fp.git"
+  },
+  "author": "Alexander Antaya, Sydney Hurley, Jack Palmstrom, Amanda Pennie",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/jnpalmstrom/fp/issues"
+  },
+  "homepage": "https://github.com/jnpalmstrom/fp#readme",
+  "dependencies": {
+    "clipboard": "^2.0.1",
+    "connect-flash": "^0.1.1",
+    "cookie-parser": "^1.4.3",
+    "d3": "^5.7.0",
+    "dimple": "0.0.13",
+    "ejs": "^2.6.1",
+    "express": "^4.16.3",
+    "express-session": "^1.15.6",
+    "fs": "0.0.1-security",
+    "helmet": "^3.13.0",
+    "instascan": "^1.0.0",
+    "mocha": "^5.2.0",
+    "mongoose": "^5.2.14",
+    "mongoose-encryption": "^2.0.1",
+    "morgan": "^1.9.1",
+    "passport": "^0.4.0",
+    "passport-local": "^1.0.0",
+    "password-hash": "^1.2.2",
+    "path": "^0.12.7",
+    "randombytes": "^2.0.6"
+  },
+  "devDependencies": {
+    "ws": "3.3.2"
+  }
+}

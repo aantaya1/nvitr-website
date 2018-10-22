@@ -1,0 +1,52 @@
+<!doctype html>
+<html>
+    <head>
+        <link rel="icon" href="/logo.png">
+        <title>Nvitr Authentication</title>
+        <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.0.2/css/bootstrap.min.css"> <!-- load bootstrap css -->
+        <link rel="stylesheet" href="//netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.min.css"> <!-- load fontawesome -->
+        <link rel="stylesheet" type="text/css" href="/css/style.css">
+        <!-- jQuery CDN -->
+        <script src="https://code.jquery.com/jquery-1.12.0.min.js"></script>
+        <style> body{ padding-top:80px; background:#23cbfd;} </style>
+    </head>
+    <body>
+        <div class="title">
+            <text>Nvitr</text>
+            <br>
+            <p style="color: white;"> - The hub for your event management - </p>
+        </div>
+
+        <div class="login">
+            <div class="form">
+                <h3>Login</h3><br>
+                <!-- show any messages that come back with authentication -->
+                <% if (message.length > 0) { %>
+                <div class="alert alert-danger" id="flashMessage"><%= message %></div>
+                <% } %>
+                <form class="login-form" action="/login" method="post">
+                    <input type="text" placeholder="username" name="username"/>
+                    <input type="password" placeholder="password" name="password"/>
+                    <button type="submit" onclick="loadSpinner()">Log In </button>
+                    <span id="spinner"></span>
+                    <p class="message">Not registered?
+                        <a href="/signup">Create an account</a>
+                    </p>
+                </form>
+            </div>
+        </div>
+    <script>
+        function loadSpinner() {
+            document.getElementById("spinner").innerHTML = '<i class="fa fa-spinner fa-spin" style="font-size:32px"></i>';
+        }
+    </script>
+
+    <script>
+        $(function() {
+            $('#flashMessage').delay(500).fadeIn('normal', function() {
+                $(this).delay(2500).fadeOut();
+            });
+        });
+    </script>
+    </body>
+</html>

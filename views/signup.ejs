@@ -1,0 +1,96 @@
+<!doctype html>
+<html>
+<head>
+    <link rel="icon" href="/logo.png">
+    <title>Nvitr Authentication</title>
+    <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.0.2/css/bootstrap.min.css"> <!-- load bootstrap css -->
+    <link rel="stylesheet" href="//netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.min.css"> <!-- load fontawesome -->
+    <link rel="stylesheet" type="text/css" href="/css/style.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/zxcvbn/4.2.0/zxcvbn.js"></script>
+    <!-- jQuery CDN -->
+    <script src="https://code.jquery.com/jquery-1.12.0.min.js"></script>
+    <style> body { padding-top:80px; background:#23cbfd;} </style>
+</head>
+<body>
+<div class="title">
+    <text>Nvitr</text>
+    <br>
+    <p style="color: white;"> - The hub for your event management - </p>
+</div>
+
+<div class="signup">
+
+  <div class="form">
+      <h3>Create Account</h3><br>
+    <!-- show any messages that come back with authentication -->
+    <% if (message.length > 0) { %>
+    <div class="alert alert-danger" id="flashMessage"><%= message %></div>
+    <% } %>
+    <form class="signup-form" action="/signup" method="post">
+        <input type="text" placeholder="username" name="username" required/>
+        <input minlength="6" type="password" placeholder="password" name="password" id="_password" required/>
+        <p id="password-strength-text"></p>
+        <input type="text" placeholder="first name" name="firstName" required/>
+        <input type="text" placeholder="last name" name="lastName" required/>
+        <input type="number" min="5" max="125" placeholder="age" name="age" required/>
+        <select class="form-control" id="sel1" name="gender" required>
+            <option value="" disabled selected> gender </option>
+            <option value="Male">Male</option>
+            <option value="Female">Female</option>
+            <option value="null">I don't wish to specify</option>
+        </select>
+        <br>
+        <button type="submit" onclick="loadSpinner()">Sign Up</button>
+        <span id="spinner"></span>
+        <p class="message">Already have an account?
+            <a href="/login">Sign In</a>
+        </p>
+    </form>
+  </div>
+</div>
+</body>
+
+<script>
+    $(function() {
+        $('#flashMessage').delay(500).fadeIn('normal', function() {
+            $(this).delay(2500).fadeOut();
+        });
+    });
+</script>
+
+<script>
+    let strength = {
+        0: "Worst",
+        1: "Bad",
+        2: "Weak",
+        3: "Good",
+        4: "Strong"
+    }
+
+    let password = document.getElementById('_password');
+    let text = document.getElementById('password-strength-text');
+
+    password.addEventListener('input', function()
+    {
+        let val = password.value;
+        let result = zxcvbn(val);
+        // Update the text indicator
+        if(val !== "") {
+            text.innerHTML = "Strength: " + "<strong>" + strength[result.score] + "</strong>" +
+                "<span class='feedback'>" + result.feedback.warning + " " + result.feedback.suggestions + "</span";
+        }
+        else text.innerHTML = "";
+    });
+</script>
+
+<style>
+    .feedback {
+        color: #9ab;
+        font-size: 90%;
+        padding: 0 .25em;
+        font-family: Courgette, cursive;
+        margin-top: 1em;
+    }
+</style>
+
+</html>

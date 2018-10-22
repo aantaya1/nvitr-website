@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+
+    <title>Nvitr Home</title>
+    <link rel="icon" href="/logo.png">
+    <link rel="stylesheet" href="//netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.min.css">
+    <!-- Bootstrap CSS CDN -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <!-- Scrollbar Custom CSS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/malihu-custom-scrollbar-plugin/3.1.5/jquery.mCustomScrollbar.min.css">
+    <link rel="stylesheet" type="text/css" href="/css/style.css">
+    <script type="text/javascript" src="instascan.min.js"></script>
+</head>
+<body>
+
+<div class="wrapper">
+    <!-- Sidebar Partial -->
+    <%include ../views/partials/sidebar.ejs%>
+    <!-- Page Content Holder -->
+    <div id="content">
+        <!-- Navbar Partial -->
+        <%include ../views/partials/navbar.ejs%>
+
+        <h2>Accept Event Invitation</h2>
+        <strong>Username: </strong><%= user.username %><br>
+        <div id="loading"></div>
+
+        <video id="preview"></video>
+
+        <script type="text/javascript">
+            let scanner = new Instascan.Scanner({ video: document.getElementById('preview') });
+            scanner.addListener('scan', function (content) {
+                let params = {
+                    'username': "<%= user.username  %>",
+                    'eventid' : "'" + content + "'"
+                }
+
+                let xhr = new XMLHttpRequest();
+                xhr.onreadystatechange = function () {
+                    window.location.assign('/home')
+                };
+                xhr.open('GET', '/addUserToEvent/'+content, true);
+                xhr.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+                xhr.onload = function () {
+                    document.getElementById('loading').innerHTML = '<i class="fa fa-spinner fa-spin" style="font-size:60px"></i>';
+                };
+                xhr.send(JSON.stringify(params));
+
+            });
+            Instascan.Camera.getCameras().then(function (cameras) {
+                if (cameras.length > 0) {
+                    scanner.start(cameras[0]);
+                } else {
+                    console.error('No cameras found.');
+                }
+            }).catch(function (e) {
+                console.error(e);
+            });
+        </script>
+    </div>
+</div>
+
+<!-- jQuery CDN -->
+<script src="https://code.jquery.com/jquery-1.12.0.min.js"></script>
+<!-- Bootstrap Js CDN -->
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+<!-- jQuery Custom Scroller CDN -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/malihu-custom-scrollbar-plugin/3.1.5/jquery.mCustomScrollbar.concat.min.js"></script>
+
+<script type="text/javascript">
+    $(document).ready(function () {
+        $("#sidebar").mCustomScrollbar({
+            theme: "minimal"
+        });
+
+        $('#sidebarCollapse').on('click', function () {
+            $('#sidebar, #content').toggleClass('active');
+            $('.collapse.in').toggleClass('in');
+            $('a[aria-expanded=true]').attr('aria-expanded', 'false');
+        });
+    });
+</script>
+</body>
+</html>

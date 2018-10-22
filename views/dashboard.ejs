@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <script src="http://d3js.org/d3.v4.min.js"></script>
+    <script src="http://dimplejs.org/dist/dimple.v2.3.0.min.js"></script>
+
+    <title>Nvitr</title>
+    <link rel="icon" href="/logo.png">
+
+    <!-- Bootstrap CSS CDN -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <!-- Scrollbar Custom CSS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/malihu-custom-scrollbar-plugin/3.1.5/jquery.mCustomScrollbar.min.css">
+    <link rel="stylesheet" type="text/css" href="/css/style.css">
+
+</head>
+<body>
+
+<div class="wrapper">
+    <!-- Sidebar Partial -->
+    <%include ../views/partials/sidebar.ejs%>
+    <!-- Page Content Holder -->
+    <div id="content">
+        <!-- Navbar Partial -->
+        <%include ../views/partials/navbar.ejs%>
+
+        <h2>Event Data Analytics</h2>
+
+        <div class="list-group">
+
+  <div id='chartContainer'>
+		<h3>Attendace By Age</h3>
+		<script type="text/javascript">
+			var svg = dimple.newSvg('#chartContainer', 600,400);
+			d3.csv('AttendanceByAge.csv', function(data) {
+			var ageChart = new dimple.chart(svg,data);
+			ageChart.setBounds(60,30,510,305);
+			var x = ageChart.addCategoryAxis('x', 'Age');
+		  x.addOrderRule('Age');
+			var y = ageChart.addMeasureAxis('y', 'Count');
+			var s = ageChart.addSeries("Count", dimple.plot.bar);
+			ageChart.addSeries(null, dimple.plot.bar);
+			ageChart.draw(1000);
+			 });
+		</script>
+	</div>
+
+  <div id='chartContainer2'>
+  <h3>Total Time Spent at Event </h3>
+  <script type="text/javascript">
+    var svg2 = dimple.newSvg('#chartContainer2', 600,400);
+    d3.csv('TotalTime.csv', function(data) {
+      var totalTimeChart = new dimple.chart(svg2,data);
+      totalTimeChart.setBounds(60,30,510,305);
+      var x = totalTimeChart.addCategoryAxis('x', 'Total Time at Event');
+      x.addOrderRule('Total Time at Event');
+      var y = totalTimeChart.addMeasureAxis('y', 'Count');
+      var s = totalTimeChart.addSeries(null, dimple.plot.line);
+      totalTimeChart.draw(1000);
+    });
+  </script>
+</div>
+
+<div id='PiechartContainer1'>
+  <h3>Gender of Attendees</h3>
+  <script type="text/javascript">
+    var svg3 = dimple.newSvg("#PiechartContainer1", 590, 400);
+    d3.csv("AttendeeGender.csv", function (data) {
+    var GenderChart = new dimple.chart(svg3, data);
+    GenderChart.setBounds(20, 20, 460, 360)
+    GenderChart.addMeasureAxis("p", "Attendee ID");
+    GenderChart.addSeries("Gender", dimple.plot.pie);
+    GenderChart.addLegend(500, 20, 90, 300, "left");
+    GenderChart.draw();
+    });
+  </script>
+</div>
+
+
+        </div>
+    </div>
+</div>
+
+<!-- jQuery CDN -->
+<script src="https://code.jquery.com/jquery-1.12.0.min.js"></script>
+<!-- Bootstrap Js CDN -->
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+<!-- jQuery Custom Scroller CDN -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/malihu-custom-scrollbar-plugin/3.1.5/jquery.mCustomScrollbar.concat.min.js"></script>
+
+<script type="text/javascript">
+    $(document).ready(function () {
+        $("#sidebar").mCustomScrollbar({
+            theme: "minimal"
+        });
+
+        $('#sidebarCollapse').on('click', function () {
+            $('#sidebar, #content').toggleClass('active');
+            $('.collapse.in').toggleClass('in');
+            $('a[aria-expanded=true]').attr('aria-expanded', 'false');
+        });
+    });
+</script>
+</body>
+</html>

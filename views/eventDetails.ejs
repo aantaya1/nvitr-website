@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+
+    <title>Nvitr</title>
+    <link rel="icon" href="/logo.png">
+    <link rel="icon" href="/clippy.png">
+
+    <script type="text/javascript" src="/qrcode.min.js"></script>
+
+    <!-- Bootstrap CSS CDN -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <!-- Scrollbar Custom CSS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/malihu-custom-scrollbar-plugin/3.1.5/jquery.mCustomScrollbar.min.css">
+    <link rel="stylesheet" type="text/css" href="/css/style.css">
+    <script type="text/javascript" src="/instascan.min.js"></script>
+
+</head>
+<body>
+
+<div class="wrapper">
+    <!-- Sidebar Partial -->
+    <%include ../views/partials/sidebar.ejs%>
+    <!-- Page Content Holder -->
+    <div id="content">
+        <!-- Navbar Partial -->
+        <%include ../views/partials/navbar.ejs%>
+
+        <h2>Event Details</h2>
+
+        <div class="list-group">
+            <%var duration = getNormalDuration(event.duration)%>
+            <%var date = getNormalDate(event.time)%>
+            <%var time = getNormalTime(event.time)%>
+            <%var timeUntil = daysUntilEvent(event.time) %>
+            <a href="#" class="list-group-item list-group-item-action flex-column align-items-start">
+                <div class="d-flex w-100 justify-content-between">
+                    <h5 class="mb-1"><%= event.title %></h5>
+                    <small class="text-muted"> There are <%= timeUntil %> days until this event.</small>
+                </div>
+                <p class="mb-1"><%= event.description %></p>
+                <small class="text-muted"><b>Location:</b> <%= event.address %>, <%= event.city %>, <%= event.state %></small><br>
+                <small class="text-muted"><b>Date:</b> <%= date %></small><br>
+                <small><b>Time:</b> <%= time %> EST</small><br>
+                <small class="text-muted"><b>Duration:</b> <%= duration[0] %> days, <%= duration[1] %> hours, <%= duration[2] %> minutes</small>
+
+                <%if(isAdmin === false){%>
+                <div class="well">
+                    <div><strong>Present this QR Code at the event to be accepted to the event!
+                            </strong></div>
+                    <div id="qrcode"></div>
+                </div>
+                <%}%>
+            </a>
+
+            <%if(isAdmin === true){%>
+                <br>
+                <ul class="nav nav-tabs">
+                    <li class="active"><a data-toggle="tab" href="#share">Share Event</a></li>
+                    <li><a data-toggle="tab" href="#checkin">Check In Attendees</a></li>
+                    <li><a data-toggle="tab" href="#edit">Edit Event</a></li>
+                </ul>
+
+                <div class="tab-content">
+                    <div id="share" class="tab-pane fade in active">
+                        <h3>Invite other people to this event!</h3>
+                        <div>
+                            <p>Via Event ID:</p>
+                            <input id="foo" value="<%= event._id %>">
+                            <!-- Trigger -->
+                            <button class="btn" data-clipboard-target="#foo">Copy to Clipboard :)</button>
+                        </div>
+                        <h5> or </h5>
+                        <div id="shareQR"></div>
+                    </div>
+                    <div id="checkin" class="tab-pane fade">
+                        <h3>Scan Attendee's QRCode entering or exiting the event</h3>
+                        <video id="preview"></video>
+
+                        <div class="btn-toolbar">
+                            <div class="btn-group mr-2" role="group">
+                                <button onclick="checkUserIn(0)" type="button" class="btn btn-primary btn-lg" id="checkin2" disabled>Check In</button>
+                            </div>
+                            <div class="btn-group mr-2" role="group">
+                                <button onclick="checkUserIn(1)" type="button" class="btn btn-danger btn-lg" id="checkout" disabled>Check Out</button>
+                            </div>
+                        </div>
+
+                        <script type="text/javascript">
+                            let scanner = new Instascan.Scanner({ video: document.getElementById('preview') });
+                            let userid = '';
+                            scanner.addListener('scan', function (content) {
+                                document.getElementById("checkin2").disabled = false;
+                                document.getElementById("checkout").disabled = false;
+                                userid = content;
+                            });
+                            Instascan.Camera.getCameras().then(function (cameras) {
+                                if (cameras.length > 0) {
+                                    scanner.start(cameras[0]);
+                                } else {
+                                    console.error('No cameras found.');
+                                }
+                            }).catch(function (e) {
+                                console.error(e);
+                            });
+
+                            function checkUserIn(x) {
+                                document.getElementById("checkin2").disabled = true;
+                                document.getElementById("checkout").disabled = true;
+
+                                let xhr = new XMLHttpRequest();
+                                xhr.open('POST', '/checkinEvent', true);
+                                xhr.setRequestHeader('Content-type', 'application/json;charset=UTF-8');
+                                xhr.send(JSON.stringify({
+                                    'userid': userid,
+                                    'eventid' : '<%= event._id %>',
+                                    'isCheckin' : x
+                                }));
+                            }
+                        </script>
+
+                    </div>
+                    <div id="edit" class="tab-pane fade">
+                        <h3>Edit this event</h3>
+                        <p>*Please fill out all non-optional fields below.</p>
+                        <div style="padding-top: 25px">
+                            <form action="/editEvent" method="post">
+                                <div class="form-group">
+                                    <label>Event Title</label>
+                                    <input type="text" class="form-control" name="title" placeholder="<%= event.title %>" maxlength="70" required>
+                                </div>
+                                <div class="form-group">
+                                    <label>Description</label>
+                                    <input type="text" class="form-control" name="description" placeholder="<%= event.description %>" maxlength="500" required>
+                                </div>
+                                <div class="form-group">
+                                    <label>Address</label>
+                                    <input type="text" class="form-control" name="address" placeholder="<%= event.address %>" maxlength="70" required>
+                                </div>
+                                <div class="form-group">
+                                    <label>City</label>
+                                    <input type="text" class="form-control" name="city" placeholder="<%= event.city %>" maxlength="70" required>
+                                </div>
+                                <div class="form-group">
+                                    <label>State</label>
+                                    <input type="text" class="form-control" name="state" placeholder="<%= event.state %>" maxlength="70" required>
+                                </div>
+                                <div class="form-group">
+                                    <label>Time of Event</label>
+                                    <input type="time" class="form-control" name="time" required>
+                                </div>
+                                <div class="form-group">
+                                    <label>Date of Event</label>
+                                    <input type="date" class="form-control" name="time" required>
+                                </div>
+                                <div class="form-group">
+                                    <label>Duration</label>
+                                    <input type="number" class="form-control" name="days" placeholder="days" min="0" max="365" required>
+                                    <input type="number" class="form-control" name="hours" placeholder="hours" min="0" max="24" required>
+                                    <input type="number" class="form-control" name="minutes" placeholder="minutes" min="0" max="60" required>
+                                </div>
+                                <div class="form-group">
+                                    <label>Capacity (optional)</label>
+                                    <input type="number" min="0" class="form-control" name="capacity" placeholder="<%= event.capacity %>" maxlength="15">
+                                </div>
+                                <div class="form-group">
+                                    <label>Minimum age (optional)</label>
+                                    <input type="number" min="1" class="form-control" name="minAge" placeholder="<%= event.minAge %>" max="125">
+                                </div>
+                                <input type="hidden" name="editEventID" value="<%= event._id %>">
+                                <button type="submit" class="btn btn-warning btn-lg">Edit Event</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            <%}%>
+
+            <%  // Splices the Date for only the date portion
+            function getNormalDuration(milliseconds) {
+                var days = Math.floor((milliseconds / 86400000));
+                const minusDays = Math.floor(milliseconds - (days * 86400000));
+                var hours = Math.floor((minusDays / 3600000));
+                const minusHours = Math.floor(minusDays - (hours * 3600000));
+                var mins = Math.floor((minusHours / 60000));
+                return [days, hours, mins];
+            }
+
+            // Splices the Date for only the time portion
+            function getNormalDate(date) {
+                let newString = date.toString();
+                return newString.slice(0,15);
+            }
+
+            function getNormalTime(date) {
+                let newString = date.toString();
+                return newString.slice(16,21);
+            }
+
+            function daysUntilEvent(date) {
+                var rightNow = new Date().getTime();
+                var dateInMS = date.getTime();
+                var offsetTime = dateInMS - rightNow;
+
+                return Math.floor((offsetTime / 86400000));
+            }
+            %>
+        </div>
+    </div>
+</div>
+
+<!-- jQuery CDN -->
+<script src="https://code.jquery.com/jquery-1.12.0.min.js"></script>
+<!-- Bootstrap Js CDN -->
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+<!-- jQuery Custom Scroller CDN -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/malihu-custom-scrollbar-plugin/3.1.5/jquery.mCustomScrollbar.concat.min.js"></script>
+<!-- Clipboard CDN -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.0/clipboard.min.js"></script>
+
+<script type="text/javascript">
+    $(document).ready(function () {
+        $("#sidebar").mCustomScrollbar({
+            theme: "minimal"
+        });
+
+        $('#sidebarCollapse').on('click', function () {
+            $('#sidebar, #content').toggleClass('active');
+            $('.collapse.in').toggleClass('in');
+            $('a[aria-expanded=true]').attr('aria-expanded', 'false');
+        });
+    });
+</script>
+<script type="text/javascript">
+    let qrcode = new QRCode(document.getElementById("qrcode"), {
+        text: "<%= user._id %>",
+        width: 128,
+        height: 128,
+        colorDark : "#000000",
+        colorLight : "#ffffff",
+        correctLevel : QRCode.CorrectLevel.H
+    });
+</script>
+<script type="text/javascript">
+    let otherQrcode = new QRCode(document.getElementById("shareQR"), {
+        text: "<%= event._id %>",
+        width: 128,
+        height: 128,
+        colorDark : "#000000",
+        colorLight : "#ffffff",
+        correctLevel : QRCode.CorrectLevel.H
+    });
+</script>
+
+<script>
+    (function(){
+        new ClipboardJS('.btn');
+    })();
+</script>
+
+
+</body>
+</html>

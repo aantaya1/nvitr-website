@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+
+    <title>Nvitr</title>
+    <link rel="icon" href="/logo.png">
+
+    <!-- Bootstrap CSS CDN -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <!-- Scrollbar Custom CSS -->
+    <link rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/malihu-custom-scrollbar-plugin/3.1.5/jquery.mCustomScrollbar.min.css">
+    <link rel="stylesheet" type="text/css" href="/css/style.css">
+
+</head>
+<body>
+
+<div class="wrapper">
+    <!-- Sidebar Holder -->
+    <%include ../views/partials/sidebar.ejs%>
+    <!-- Page Content Holder -->
+    <div id="content">
+        <%include ../views/partials/navbar.ejs%>
+
+        <h2>PREVIOUS EVENTS</h2>
+
+        <div class="list-group">
+            <% if(events.length > 0){ %>
+                <% events.forEach(function (event) { %>
+                        <% var duration = getNormalDuration(event.duration) %>
+                        <% var date = getNormalDate(event.time) %>
+                        <% var time = getNormalTime(event.time) %>
+
+                        <a href="/getPrevEventAnalytics/<%= event._id %>"
+                           class="list-group-item list-group-item-action flex-column align-items-start">
+                            <div class="d-flex w-100 justify-content-between">
+                                <h5 class="mb-1"><%= event.title %></h5>
+                            </div>
+                            <p class="mb-1"><%= event.description %></p>
+                            <small class="text-muted"><b>Location:</b> <%= event.address %>, <%= event.city %>
+                                , <%= event.state %></small>
+                            <br>
+                            <small class="text-muted"><b>Date:</b> <%= date %></small>
+                            <br>
+                            <small><b>Time:</b> <%= time %> EST</small>
+                            <br>
+                            <small class="text-muted"><b>Duration:</b> <%= duration[0] %> days, <%= duration[1] %>
+                                hours, <%= duration[2] %> minutes
+                            </small>
+                        </a>
+                <% }); %>
+            <% } %>
+
+            <% // Splices the Date for only the date portion
+            function getNormalDuration(milliseconds) {
+                var days = Math.floor((milliseconds / 86400000));
+                const minusDays = Math.floor(milliseconds - (days * 86400000));
+                var hours = Math.floor((minusDays / 3600000));
+                const minusHours = Math.floor(minusDays - (hours * 3600000));
+                var mins = Math.floor((minusHours / 60000));
+                return [days, hours, mins];
+            }
+            %>
+            <% // Splices the Date for only the time portion
+            function getNormalDate(date) {
+                let newString = date.toString();
+                return newString.slice(0, 15);
+            }
+
+            function getNormalTime(date) {
+                let newString = date.toString();
+                return newString.slice(16, 21);
+            }
+            %>
+        </div>
+    </div>
+</div>
+
+<!-- jQuery CDN -->
+<script src="https://code.jquery.com/jquery-1.12.0.min.js"></script>
+<!-- Bootstrap Js CDN -->
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+<!-- jQuery Custom Scroller CDN -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/malihu-custom-scrollbar-plugin/3.1.5/jquery.mCustomScrollbar.concat.min.js"></script>
+
+<script type="text/javascript">
+    $(document).ready(function () {
+        $("#sidebar").mCustomScrollbar({
+            theme: "minimal"
+        });
+
+        $('#sidebarCollapse').on('click', function () {
+            $('#sidebar, #content').toggleClass('active');
+            $('.collapse.in').toggleClass('in');
+            $('a[aria-expanded=true]').attr('aria-expanded', 'false');
+        });
+    });
+</script>
+</body>
+</html>

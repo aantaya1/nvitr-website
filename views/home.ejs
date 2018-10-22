@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+
+    <title>Nvitr</title>
+    <link rel="icon" href="/logo.png">
+
+    <!-- Bootstrap CSS CDN -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <!-- Scrollbar Custom CSS -->
+    <link rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/malihu-custom-scrollbar-plugin/3.1.5/jquery.mCustomScrollbar.min.css">
+    <link rel="stylesheet" type="text/css" href="/css/style.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+</head>
+<body>
+
+<div class="wrapper">
+    <!-- Sidebar Partial -->
+    <%include ../views/partials/sidebar.ejs%>
+    <!-- Page Content Holder -->
+    <div id="content">
+        <!-- Navbar Partial -->
+        <%include ../views/partials/navbar.ejs%>
+
+        <h2>HOME</h2>
+
+        <!-- show any messages that come back with authentication -->
+        <% if (eventMessage.length > 0) { %>
+        <div class="alert alert-danger" id="flashMessage"><%= eventMessage %></div>
+        <% } %>
+
+        <script>
+            $(function() {
+                $('#flashMessage').delay(500).fadeIn('normal', function() {
+                    $(this).delay(2500).fadeOut();
+                });
+            });
+        </script>
+
+        <div class="list-group">
+
+            <div id="loading"></div>
+            <% if(events.length === 0){ %>You are not registered for any events!
+            <% } %>
+
+            <% if(events.length > 0){ %>
+                <% events.forEach(function (event) { %>
+                    <% if (event.completed !== true) { %>
+                        <% var duration = getNormalDuration(event.duration) %>
+                        <% var date = getNormalDate(event.time) %>
+                        <% var time = getNormalTime(event.time) %>
+                        <% var timeUntil = daysUntilEvent(event.time) %>
+                        <a href="/getEventDetails/<%= event._id %>"
+                           class="list-group-item list-group-item-action flex-column align-items-start">
+                            <div class="d-flex w-100 justify-content-between">
+                                <h5 class="mb-1"><%= event.title %></h5>
+                                <small class="text-muted"> There are <%= timeUntil %> days until this event.</small>
+                            </div>
+                            <p class="mb-1"><%= event.description %></p>
+                            <small class="text-muted"><b>Location:</b> <%= event.address %>, <%= event.city %>, <%= event.state %></small>
+                            <br>
+                            <small class="text-muted"><b>Date:</b> <%= date %></small>
+                            <br>
+                            <small><b>Time:</b> <%= time %> EST</small>
+                            <br>
+                            <small class="text-muted"><b>Duration:</b> <%= duration[0] %> days, <%= duration[1] %>
+                                hours, <%= duration[2] %> minutes
+                            </small>
+                        </a>
+                    <% } %>
+                <% }); %>
+            <% } %>
+
+            <% // Splices the Date for only the date portion
+            function getNormalDuration(milliseconds) {
+                var days = Math.floor((milliseconds / 86400000));
+                const minusDays = Math.floor(milliseconds - (days * 86400000));
+                var hours = Math.floor((minusDays / 3600000));
+                const minusHours = Math.floor(minusDays - (hours * 3600000));
+                var mins = Math.floor((minusHours / 60000));
+                return [days, hours, mins];
+            }
+            %>
+            <% // Splices the Date for only the time portion
+            function getNormalDate(date) {
+                let newString = date.toString();
+                return newString.slice(0, 15);
+            }
+
+            function getNormalTime(date) {
+                let newString = date.toString();
+                return newString.slice(16, 21);
+            }
+
+            function daysUntilEvent(date) {
+                var rightNow = new Date().getTime();
+                var dateInMS = date.getTime();
+                var offsetTime = dateInMS - rightNow;
+
+                return Math.floor((offsetTime / 86400000));
+            }
+            %>
+        </div>
+    </div>
+</div>
+
+
+<!-- jQuery CDN -->
+<script src="https://code.jquery.com/jquery-1.12.0.min.js"></script>
+<!-- Bootstrap Js CDN -->
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+<!-- jQuery Custom Scroller CDN -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/malihu-custom-scrollbar-plugin/3.1.5/jquery.mCustomScrollbar.concat.min.js"></script>
+
+<script type="text/javascript">
+    $(document).ready(function () {
+        $("#sidebar").mCustomScrollbar({
+            theme: "minimal"
+        });
+
+        $('#sidebarCollapse').on('click', function () {
+            $('#sidebar, #content').toggleClass('active');
+            $('.collapse.in').toggleClass('in');
+            $('a[aria-expanded=true]').attr('aria-expanded', 'false');
+        });
+    });
+</script>
+</body>
+</html>

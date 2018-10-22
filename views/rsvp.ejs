@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+
+    <title>Nvitr Home</title>
+    <link rel="icon" href="/logo.png">
+    <link rel="stylesheet" href="//netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.min.css">
+    <!-- Bootstrap CSS CDN -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <!-- Scrollbar Custom CSS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/malihu-custom-scrollbar-plugin/3.1.5/jquery.mCustomScrollbar.min.css">
+    <link rel="stylesheet" type="text/css" href="/css/style.css">
+
+</head>
+<body>
+
+<div class="wrapper">
+    <!-- Sidebar Partial -->
+    <%include ../views/partials/sidebar.ejs%>
+    <!-- Page Content Holder -->
+    <div id="content">
+        <!-- Navbar Partial -->
+        <%include ../views/partials/navbar.ejs%>
+
+        <h2>ACCEPT EVENT INVITATION</h2>
+
+        <div class="well">
+            <p>
+            <form action="/scanqr" method="post">
+                <button type="submit" class="btn btn-primary btn-lg btn-block qrcode">
+                    <i class="fa fa-qrcode fa-2x" aria-hidden="true"></i>     Scan QR Code</button>
+            </form>
+            <br>
+            <label>Invitation Link </label>
+            <input type="text" class="form-control" name="eventLink" id="eventValue">
+            <button type="submit" onclick="myFunction()" class="btn btn-warning btn-lg">Submit</button>
+            </p>
+        </div>
+        <script>
+            function myFunction() {
+                let xhr = new XMLHttpRequest();
+                let eventid = document.getElementById("eventValue").value;
+                console.log('Found an event ID: ' + eventid);
+                xhr.onreadystatechange = function () {
+                    window.location.assign('/home')
+                };
+                xhr.open("GET", "/addUserToEvent/"+eventid, true);
+                xhr.send();
+
+            }
+        </script>
+    </div>
+</div>
+
+<!-- jQuery CDN -->
+<script src="https://code.jquery.com/jquery-1.12.0.min.js"></script>
+<!-- Bootstrap Js CDN -->
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+<!-- jQuery Custom Scroller CDN -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/malihu-custom-scrollbar-plugin/3.1.5/jquery.mCustomScrollbar.concat.min.js"></script>
+
+<script type="text/javascript">
+    $(document).ready(function () {
+        $("#sidebar").mCustomScrollbar({
+            theme: "minimal"
+        });
+
+        $('#sidebarCollapse').on('click', function () {
+            $('#sidebar, #content').toggleClass('active');
+            $('.collapse.in').toggleClass('in');
+            $('a[aria-expanded=true]').attr('aria-expanded', 'false');
+        });
+    });
+</script>
+</body>
+</html>
