@@ -1,8 +1,6 @@
-# cs4241-FinalProject
+# CS4241-FinalProject
 
-**Submitted To:** Professor Lane Harrison and Course Staff
-
-**Submitted By:** Alexander Antaya, Sydney Hurley, Jack Palmstrom, and Amanda Pennie
+**Developed By:** Alexander Antaya & Jack Palmstrom
 
 **Link to app:** https://fp-nvitr.herokuapp.com/login
 
